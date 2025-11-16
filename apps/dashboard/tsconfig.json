@@ -9,11 +9,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "incremental": true,
+    "incremental": false,       // <- wichtig, deaktiviert inkrementelles Kompilieren
     "plugins": [{ "name": "next" }],
     "paths": { "@/*": ["./src/*"] },
     "rootDir": "src"
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", ".next"]  // <- .next ausschließen
 }
