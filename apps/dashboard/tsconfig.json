@@ -10,9 +10,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "incremental": true,
-    "plugins": [
-      { "name": "next" }
-    ],
+    "plugins": [{ "name": "next" }],
     "paths": { "@/*": ["./src/*"] },
     "rootDir": "src"
   },
