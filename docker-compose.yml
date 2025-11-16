@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: kodari
+      POSTGRES_PASSWORD: kodari_pass
+      POSTGRES_DB: kodari_bot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kodari"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  lavalink:
+    image: fredboat/lavalink:latest
+    ports:
+      - "2333:2333"
+    volumes:
+      - ./lavalink-config/application.yml:/opt/Lavalink/application.yml
+    environment:
+      SERVER_PORT: 2333
+      LAVALINK_SERVER_PASSWORD: youshallnotpass
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:
+  redis_data:

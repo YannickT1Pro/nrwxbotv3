@@ -1,0 +1,285 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Guild {
+  id                    String   @id
+  name                  String
+  prefix                String   @default("!")
+  
+  welcomeChannelId      String?
+  welcomeMessage        String?
+  welcomeRoleId         String?
+  welcomeDmEnabled      Boolean  @default(false)
+  
+  logChannelId          String?
+  modLogChannelId       String?
+  ticketLogChannelId    String?
+  
+  antiSpamEnabled       Boolean  @default(true)
+  antiSpamThreshold     Int      @default(5)
+  antiSpamTimeWindow    Int      @default(5)
+  
+  antiRaidEnabled       Boolean  @default(true)
+  antiRaidJoinThreshold Int      @default(10)
+  antiRaidTimeWindow    Int      @default(10)
+  
+  antiNukeEnabled       Boolean  @default(true)
+  
+  linkFilterEnabled     Boolean  @default(false)
+  linkWhitelist         String[] @default([])
+  linkBlacklist         String[] @default([])
+  
+  musicMaxQueueLength   Int      @default(100)
+  musicAutoLeaveTimeout Int      @default(30)
+  
+  verificationEnabled   Boolean  @default(false)
+  verificationRoleId    String?
+  verificationChannelId String?
+  minAccountAge         Int      @default(7)
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  ticketCategories      TicketCategory[]
+  tickets               Ticket[]
+  reactionRoles         ReactionRole[]
+  moderationCases       ModerationCase[]
+  teamActions           TeamAction[]
+  aiSupportTriggers     AISupportTrigger[]
+  teamRoles             TeamRole[]
+  
+  @@index([id])
+}
+
+model TicketCategory {
+  id              String   @id @default(cuid())
+  guildId         String
+  guild           Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  
+  name            String
+  emoji           String?
+  description     String?
+  teamRoleId      String?
+  
+  useForm         Boolean  @default(false)
+  formFields      Json?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  tickets         Ticket[]
+  
+  @@index([guildId])
+}
+
+model Ticket {
+  id              String         @id @default(cuid())
+  guildId         String
+  guild           Guild          @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  
+  categoryId      String
+  category        TicketCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  channelId       String         @unique
+  creatorId       String
+  claimerId       String?
+  
+  state           TicketState    @default(OPEN)
+  
+  formData        Json?
+  
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  closedAt        DateTime?
+  
+  logs            TicketLog[]
+  
+  @@index([guildId])
+  @@index([channelId])
+  @@index([creatorId])
+}
+
+enum TicketState {
+  OPEN
+  CLAIMED
+  CLOSED
+}
+
+model TicketLog {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  userId    String
+  action    String
+  details   Json?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([ticketId])
+}
+
+model ReactionRole {
+  id         String   @id @default(cuid())
+  guildId    String
+  guild      Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  
+  messageId  String
+  channelId  String
+  emoji      String
+  roleId     String
+  
+  createdAt  DateTime @default(now())
+  
+  @@unique([messageId, emoji])
+  @@index([guildId])
+  @@index([messageId])
+}
+
+model ModerationCase {
+  id          String         @id @default(cuid())
+  guildId     String
+  guild       Guild          @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  
+  caseNumber  Int
+  type        ModerationType
+  
+  userId      String
+  moderatorId String
+  reason      String
+  
+  duration    Int?
+  active      Boolean        @default(true)
+  
+  createdAt   DateTime       @default(now())
+  expiresAt   DateTime?
+  
+  @@unique([guildId, caseNumber])
+  @@index([guildId])
+  @@index([userId])
+}
+
+enum ModerationType {
+  WARN
+  UNWARN
+  MUTE
+  UNMUTE
+  KICK
+  BAN
+  UNBAN
+}
+
+model TeamAction {
+  id          String   @id @default(cuid())
+  guildId     String
+  guild       Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  
+  type        String
+  targetId    String
+  moderatorId String
+  reason      String?
+  details     Json?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([guildId])
+  @@index([targetId])
+}
+
+model TeamRole {
+  id        String   @id @default(cuid())
+  guildId   String
+  guild     Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  
+  roleId    String
+  level     Int      @default(0)
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([guildId, roleId])
+  @@index([guildId])
+}
+
+model AISupportTrigger {
+  id        String   @id @default(cuid())
+  guildId   String
+  guild     Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  
+  trigger   String
+  response  String
+  isRegex   Boolean  @default(false)
+  priority  Int      @default(0)
+  enabled   Boolean  @default(true)
+  
+  useCount  Int      @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([guildId])
+}
+
+model MusicSession {
+  id              String   @id @default(cuid())
+  guildId         String   @unique
+  channelId       String
+  textChannelId   String
+  ownerId         String
+  
+  currentTrack    Json?
+  queue           Json[]   @default([])
+  
+  isPaused        Boolean  @default(false)
+  volume          Int      @default(100)
+  
+  lastActivityAt  DateTime @default(now())
+  createdAt       DateTime @default(now())
+  
+  @@index([guildId])
+}
+
+model UnmatchedQuestion {
+  id        String   @id @default(cuid())
+  guildId   String
+  userId    String
+  question  String
+  
+  resolved  Boolean  @default(false)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([guildId])
+  @@index([resolved])
+}
+
+model UserWarning {
+  id          String   @id @default(cuid())
+  guildId     String
+  userId      String
+  moderatorId String
+  reason      String
+  
+  active      Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([guildId, userId])
+}
+
+model SpamRecord {
+  id        String   @id @default(cuid())
+  guildId   String
+  userId    String
+  count     Int      @default(1)
+  
+  expiresAt DateTime
+  
+  @@unique([guildId, userId])
+  @@index([expiresAt])
+}
