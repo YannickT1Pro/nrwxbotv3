@@ -8,20 +8,26 @@ export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
+  // Client-side redirect, wenn nicht eingeloggt
   useEffect(() => {
     if (status !== 'loading' && !session) {
-      router.push('/api/auth/signin'); // Client-side redirect
+      router.push('/api/auth/signin');
     }
   }, [status, session, router]);
 
+  // Ladezustand
   if (status === 'loading') {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
-  if (!session) {
-    return null; // während Client-Redirect läuft
-  }
+  // Session noch nicht vorhanden
+  if (!session) return null;
 
+  // Dashboard Inhalt
   return (
     <div className="min-h-screen p-8">
       <h1 className="text-4xl font-bold mb-8">Dashboard</h1>
