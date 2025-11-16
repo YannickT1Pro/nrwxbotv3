@@ -1,17 +1,25 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status !== 'loading' && !session) {
+      router.push('/api/auth/signin'); // Client-side redirect
+    }
+  }, [status, session, router]);
 
   if (status === 'loading') {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
   if (!session) {
-    redirect('/api/auth/signin');
+    return null; // während Client-Redirect läuft
   }
 
   return (
