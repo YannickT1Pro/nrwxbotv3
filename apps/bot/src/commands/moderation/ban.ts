@@ -1,6 +1,6 @@
-import { SlashCommandBuilder, CommandInteraction, PermissionFlagsBits, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, EmbedBuilder } from 'discord.js';
 import { KodariBot } from '../../bot';
-import { prisma, ModerationType } from '@kodari/database';
+import { prisma } from '@kodari/database';
 
 export default {
   data: new SlashCommandBuilder()
@@ -24,7 +24,7 @@ export default {
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
-  async execute(interaction: CommandInteraction, bot: KodariBot) {
+  async execute(interaction: ChatInputCommandInteraction, bot: KodariBot) {
     const user = interaction.options.getUser('user')!;
     const reason = interaction.options.get('reason')?.value as string;
     const deleteDays = (interaction.options.get('delete_days')?.value as number) || 0;
@@ -42,7 +42,7 @@ export default {
       data: {
         guildId: interaction.guildId!,
         caseNumber,
-        type: ModerationType.BAN,
+        type: 'BAN',
         userId: user.id,
         moderatorId: interaction.user.id,
         reason,

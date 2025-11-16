@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
 import { KodariBot } from '../../bot';
 
 export default {
@@ -11,7 +11,7 @@ export default {
         .setRequired(true)
     ),
 
-  async execute(interaction: CommandInteraction, bot: KodariBot) {
+  async execute(interaction: ChatInputCommandInteraction, bot: KodariBot) {
     await interaction.deferReply();
 
     const member = interaction.member as GuildMember;

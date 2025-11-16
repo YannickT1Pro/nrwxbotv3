@@ -6,6 +6,7 @@
     "jsx": "preserve",
     "module": "esnext",
     "moduleResolution": "bundler",
+    "composite": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,

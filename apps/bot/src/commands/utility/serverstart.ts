@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { KodariBot } from '../../bot';
 
 export default {
@@ -15,7 +15,7 @@ export default {
         .setDescription('Server IP')
     ),
 
-  async execute(interaction: CommandInteraction, bot: KodariBot) {
+  async execute(interaction: ChatInputCommandInteraction, bot: KodariBot) {
     const game = interaction.options.get('game')?.value as string;
     const ip = interaction.options.get('ip')?.value as string | undefined;
 

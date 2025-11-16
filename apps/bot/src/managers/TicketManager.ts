@@ -9,7 +9,7 @@ import {
   PermissionFlagsBits,
   EmbedBuilder,
 } from 'discord.js';
-import { prisma, TicketState } from '@kodari/database';
+import { prisma } from '@kodari/database';
 import { logger } from '../utils/logger';
 
 export class TicketManager {
@@ -66,7 +66,7 @@ export class TicketManager {
         channelId: channel.id,
         creatorId,
         formData: formData || {},
-        state: TicketState.OPEN,
+        state: 'OPEN',
       },
     });
 
@@ -128,7 +128,7 @@ export class TicketManager {
       where: { id: ticketId },
       data: {
         claimerId,
-        state: TicketState.CLAIMED,
+        state: 'CLAIMED',
       },
     });
 
@@ -154,7 +154,7 @@ export class TicketManager {
     await prisma.ticket.update({
       where: { id: ticketId },
       data: {
-        state: TicketState.CLOSED,
+        state: 'CLOSED',
         closedAt: new Date(),
       },
     });
@@ -197,7 +197,7 @@ export class TicketManager {
     await prisma.ticket.update({
       where: { id: ticketId },
       data: {
-        state: TicketState.OPEN,
+        state: 'OPEN',
         closedAt: null,
       },
     });

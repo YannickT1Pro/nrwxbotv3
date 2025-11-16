@@ -65,12 +65,12 @@ manager.spawn().catch((error) => {
 
 process.on('SIGINT', async () => {
   logger.info('Received SIGINT, shutting down gracefully...');
-  await manager.broadcastEval(() => this.destroy());
+  await manager.broadcastEval((client) => client.destroy());
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
   logger.info('Received SIGTERM, shutting down gracefully...');
-  await manager.broadcastEval(() => this.destroy());
+  await manager.broadcastEval((client) => client.destroy());
   process.exit(0);
 });

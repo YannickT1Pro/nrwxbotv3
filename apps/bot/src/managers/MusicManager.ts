@@ -60,7 +60,7 @@ export class MusicManager {
       const connection = joinVoiceChannel({
         channelId: voiceChannel.id,
         guildId: guildId,
-        adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+        adapterCreator: voiceChannel.guild.voiceAdapterCreator as any,
       });
 
       const player = createAudioPlayer();

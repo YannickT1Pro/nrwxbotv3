@@ -51,8 +51,8 @@ export class AISupportManager {
           continue;
         }
       } else {
-        const keywords = trigger.trigger.toLowerCase().split('|');
-        matched = keywords.some(keyword => content.includes(keyword.trim()));
+        const keywords: string[] = String(trigger.trigger).toLowerCase().split('|');
+        matched = keywords.some((keyword: string) => content.includes(keyword.trim()));
       }
 
       if (matched) {

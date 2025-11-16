@@ -85,16 +85,18 @@ export class SecurityManager {
     for (const url of urls) {
       const domain = new URL(url).hostname;
 
-      if (config.linkBlacklist.some(blocked => domain.includes(blocked))) {
+      if (config.linkBlacklist.some((blocked: string) => domain.includes(blocked))) {
         await message.delete().catch(() => {});
-        await message.channel.send(`<@${message.author.id}> Links von dieser Domain sind nicht erlaubt.`);
+        const channel = message.channel as TextChannel;
+        await channel.send(`<@${message.author.id}> Links von dieser Domain sind nicht erlaubt.`);
         logger.warn(`Blocked blacklisted link from ${message.author.tag}: ${url}`);
         return true;
       }
 
-      if (config.linkWhitelist.length > 0 && !config.linkWhitelist.some(allowed => domain.includes(allowed))) {
+      if (config.linkWhitelist.length > 0 && !config.linkWhitelist.some((allowed: string) => domain.includes(allowed))) {
         await message.delete().catch(() => {});
-        await message.channel.send(`<@${message.author.id}> Nur Links von erlaubten Domains sind zugelassen.`);
+        const channel = message.channel as TextChannel;
+        await channel.send(`<@${message.author.id}> Nur Links von erlaubten Domains sind zugelassen.`);
         logger.warn(`Blocked non-whitelisted link from ${message.author.tag}: ${url}`);
         return true;
       }
