@@ -1,0 +1,6 @@
+{
+  "deploy": {
+    "build": "npm run build:bot",
+    "start": "npm run start:bot"
+  }
+}
