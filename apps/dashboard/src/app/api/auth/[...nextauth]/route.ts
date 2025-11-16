@@ -17,7 +17,7 @@ const handler = NextAuth({
     async jwt({ token, account, profile }) {
       if (account) {
         token.accessToken = account.access_token;
-        token.id = (profile as any)?.id; // TypeScript kennt id nicht automatisch
+        token.id = (profile as any)?.id; // TypeScript akzeptiert jetzt id
       }
       return token;
     },
